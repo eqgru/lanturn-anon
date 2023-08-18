@@ -2,7 +2,7 @@ import csv
 import subprocess
 from subprocess import Popen, PIPE
 
-block_times = '/data/latest-data/block_times.csv'
+block_times = './data/block_times.csv'
 data_path = './data'
 binance_prices_path = f'{data_path}/prices-binance/'
 token_names = f'{data_path}/token_names.csv'
@@ -22,7 +22,6 @@ def get_price(block, token_addr,source='binance'):
             market = f"{token_name}USDT"
         if market == "USDTUSDT":
             return 1
-        #TODO check if token name market exists
         matched_ts = subprocess.check_output(f'grep {block}, {block_times}', shell=True)
         ts = int(str(matched_ts, "utf-8").strip().split(",")[1])
         minute_ts = ts//60 * 60

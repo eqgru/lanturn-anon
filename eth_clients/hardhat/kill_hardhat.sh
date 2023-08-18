@@ -6,4 +6,6 @@ for ((i=0;i<CORES;i++)); do
 	pid=`ps -ef | grep hardhat | grep $PORT | awk {'print $2'}`
 	echo $pid
 	kill -s SIGTERM $pid
+	dir=$PORT
+	rm -rf $dir/cache
 done

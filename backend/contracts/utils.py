@@ -34,6 +34,15 @@ def typify(params, fn):
         if 'int' in arg_type:
             param = int(float(params[i])) #only handles int with base 10, handle hex strings in future
             typed_params.append(param)
+        elif 'bool' in arg_type:
+            if params[i] == 'false':
+                typed_params.append(False)
+            elif params[i] == 'true':
+                typed_params.append(True)
+            else:
+                # should not reach here
+                param = params[i]
+                typed_params.append(param)
         elif '[]' in arg_type: #make more robust
             param = (params[i][1:-1]).split("-")
             typed_params.append(param) 

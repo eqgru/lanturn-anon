@@ -1,5 +1,5 @@
 #!/bin/bash
-CORES=40
+CORES=44
 for ((i=0;i<CORES;i++)); do
 	PORT=$(( 8601 + $i ))
 	echo $PORT

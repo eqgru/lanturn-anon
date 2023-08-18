@@ -7,6 +7,7 @@ import logging
 from copy import deepcopy
 from contracts import utils
 from contracts.uniswap import uniswap_router_contract, sushiswap_router_contract, uniswapv3_router_contract, uniswapv3_quoter_abi, position_manager_abi, position_manager_path
+from contracts.aave import aave_contract
 from contracts.tokens import erc20_abi, weth_abi
 from web3 import Web3
 from collections import defaultdict
@@ -277,6 +278,8 @@ def parse_and_sign_contract_tx(simCtx, elements, sender, w3):
         contract = sushiswap_router_contract
     elif to_address == 'UniswapV3Router':
         contract = uniswapv3_router_contract
+    elif to_address == 'Aave':
+        contract = aave_contract
     elif to_address == WETH:
         contract = w3.eth.contract(abi=weth_abi, address=WETH)
     elif to_address == 'position_manager':
@@ -443,6 +446,15 @@ def prepare_initial_txs(simCtx, fork_url, approved_tokens, involved_dexes):
         simCtx.deployed['position_manager'] = (deployed_contract_addr)
 
     # Preparation transactions
+    if ('uniswapv3' in involved_dexes) or ('uniswapv3-jit' in involved_dexes):
+        approve_tx = '1,miner,{},0,approve,{},1000000000000000000000000000'.format(WETH, uniswapv3_router_contract.address)
+        simulate_tx(simCtx, fork_url, approve_tx, w3) #1e27
+        approve_tx = '1,miner,{},{},deposit'.format(WETH, int(MINER_CAPITAL/2/1e18))
+        simulate_tx(simCtx, fork_url, approve_tx, w3) #1e27
+    if 'uniswapv3-jit' in involved_dexes:
+        approve_tx = '1,miner,{},0,approve,{},1000000000000000000000000000'.format(WETH, deployed_contract_addr)
+        simulate_tx(simCtx, fork_url, approve_tx, w3) #1e27
+
     for token in approved_tokens:
         if 'sushiswap' in involved_dexes:
             approve_tx = '1,miner,{},0,approve,{},1000000000000000000000000000'.format(token, sushiswap_router_contract.address)
@@ -450,18 +462,15 @@ def prepare_initial_txs(simCtx, fork_url, approved_tokens, involved_dexes):
         if 'uniswapv2' in involved_dexes:
             approve_tx = '1,miner,{},0,approve,{},1000000000000000000000000000'.format(token, uniswap_router_contract.address)
             simulate_tx(simCtx, fork_url, approve_tx, w3) #1e27
-        if 'uniswapv3' or 'uniswapv3-jit' in involved_dexes:
+        if ('uniswapv3' in involved_dexes) or ('uniswapv3-jit' in involved_dexes):
             approve_tx = '1,miner,{},0,approve,{},1000000000000000000000000000'.format(token, uniswapv3_router_contract.address)
-            simulate_tx(simCtx, fork_url, approve_tx, w3) #1e27
-            approve_tx = '1,miner,{},0,approve,{},1000000000000000000000000000'.format(WETH, uniswapv3_router_contract.address)
-            simulate_tx(simCtx, fork_url, approve_tx, w3) #1e27
-            approve_tx = '1,miner,{},{},deposit'.format(WETH, int(MINER_CAPITAL/2/1e18))
             simulate_tx(simCtx, fork_url, approve_tx, w3) #1e27
         if 'uniswapv3-jit' in involved_dexes:
             # TODO approve only when deploying and using the position manager contract
             approve_tx = '1,miner,{},0,approve,{},1000000000000000000000000000'.format(token, deployed_contract_addr)
             simulate_tx(simCtx, fork_url, approve_tx, w3) #1e27
-            approve_tx = '1,miner,{},0,approve,{},1000000000000000000000000000'.format(WETH, deployed_contract_addr)
+        if 'aave' in involved_dexes:
+            approve_tx = '1,miner,{},0,approve,{},1000000000000000000000000000'.format(token, aave_contract.address)
             simulate_tx(simCtx, fork_url, approve_tx, w3) #1e27
             
     return simCtx
@@ -525,11 +534,12 @@ def simulate(simCtx, lines, port_id, involved_dexes, best=False, logfile=None, s
 
     # Mine the transactions
     mine_result = mine_block(fork_url)
-        
+
     if 'error' in mine_result:
         simlogger.warn(mine_result['error'])
         return None
     
+
     # get remaining balances
     remaining_balances = {}
     for token_addr in approved_tokens:
@@ -544,7 +554,8 @@ def simulate(simCtx, lines, port_id, involved_dexes, best=False, logfile=None, s
                 simlogger.debug("[COUNTER] %d", debug_counter)
         remaining_balances[token_addr] = balance
 
-    mev = 0
+    global MINER_CAPITAL
+    mev = 0 - MINER_CAPITAL
 
     if settlement == 'cex' or settlement == 'max':
         # view only calculation
@@ -603,14 +614,26 @@ if __name__ == '__main__':
         default='max'
     )
 
+    parser.add_argument(
+        '-o', '--optimize',
+        help="optimize/stable",
+        required=False,
+        default='stable'
+    )
+
     args = parser.parse_args()
     
+    if args.optimize == 'optimize':
+        FLAG_STABLE = False
+        FLAG_MYMINE = True
+
     data_f = open(args.file, 'r')
     port_id = int(args.port)
     lines = data_f.readlines()
     print("setting up...", lines[0])
-    ctx = setup(lines[0])
-    ctx = prepare_once(ctx, lines, port_id, ['sushiswap',])
+    ctx = setup(lines[0], capital=10000)
+    involved_dexes = ['sushiswap', 'aave', 'uniswapv3']
+    ctx = prepare_once(ctx, lines, port_id, involved_dexes)
     print("simulating...")
-    mev = simulate(ctx, lines, port_id, ['sushiswap'], False, '', args.settlement)
+    mev = simulate(ctx, lines, port_id, involved_dexes, False, '', args.settlement)
     print(mev)
