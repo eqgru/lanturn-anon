@@ -25,7 +25,7 @@ Copy the files from `dataset/data/` to `data/` directory of this repository. Thi
 
 
 # Sample optimization command:
-`python3 optimize.py -t <test_transactions> -d <test_domain> --dexes <contract_list> --n_parallel_gauss 44 -v`
+`python3 optimize.py -t <example_transactions> -d <example_domain> --dexes <contract_list> --n_parallel_gauss 44 -v`
 
 where `contract_list` can be a sublist of `['sushiswap', 'aave', 'uniswapv3', 'uniswapv2', 'uniswapv3-jit']` depending on the contracts and experiments involved.
 
@@ -36,6 +36,6 @@ If you want to run simulation standalone, sample command:
 # Example files
 concrete_transactions : `examples/optimised`
 
-test_transactions : `examples/problem`
+example_transactions : `examples/problem`
 
-test_domain : `examples/multiple_tokens_domain`
+example_domain : `examples/multiple_tokens_domain`
