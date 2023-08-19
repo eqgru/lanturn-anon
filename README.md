@@ -36,6 +36,6 @@ If you want to run simulation standalone, sample command:
 # Example files
 concrete_transactions : `examples/optimised`
 
-example_transactions : `examples/problem`
+example_transactions : `examples/multiple_tokens`
 
 example_domain : `examples/multiple_tokens_domain`
