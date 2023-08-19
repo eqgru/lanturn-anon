@@ -3,7 +3,7 @@ Run archive node, serving Ethereum HTTP JSON-RPC on port 8545
 
 Install common software dependencies: `python`, `npm`
 
-Python Modules: `pip3 install GitPython`
+Python Modules: `pip3 install GitPython pandas tqdm scikit-learn`
 
 # Simulation Clients
 The following scripts by default launch 44 simulation networks.
@@ -27,12 +27,12 @@ Copy the files from `dataset/data/` to `data/` directory of this repository. Thi
 
 
 # Sample optimization command:
-`python3 optimize.py -t <example_transactions> -d <example_domain> --dexes <contract_list> --n_parallel_gauss 44 -v`
+`python3 optimize.py -t <example_transactions> -d <example_domain> --dexes <contract_list> --n_parallel_gauss 44 --capital 1000 --reorder`
 
 where `contract_list` can be a sublist of `['sushiswap', 'aave', 'uniswapv3', 'uniswapv2', 'uniswapv3-jit']` depending on the contracts and experiments involved.
 
 
-`python3 runme.py` script automatically launches simulation clients and runs an example optimization.
+`python3 runme.py` script automatically launches simulation clients (setup has to be called manually first) and runs an example optimization.
 
 If you want to run simulation standalone, sample command:
 `python3 simulate_client.py -f <concrete_transactions> -p <PORT_ID>` where `PORT_ID = <PORT of sim client> - 8601`
