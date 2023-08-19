@@ -30,8 +30,12 @@ Copy the files from `dataset/data/` to `data/` directory of this repository. Thi
 where `contract_list` can be a sublist of `['sushiswap', 'aave', 'uniswapv3', 'uniswapv2', 'uniswapv3-jit']` depending on the contracts and experiments involved.
 
 
+`python3 runme.py` script automatically launches simulation clients and runs an example optimization.
+
 If you want to run simulation standalone, sample command:
 `python3 simulate_client.py -f <concrete_transactions> -p <PORT_ID>` where `PORT_ID = <PORT of sim client> - 8601`
+
+
 
 # Example files
 concrete_transactions : `examples/optimised`
