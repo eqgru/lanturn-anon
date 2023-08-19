@@ -34,8 +34,8 @@ If you want to run simulation standalone, sample command:
 `python3 simulate_client.py -f <concrete_transactions> -p <PORT_ID>` where `PORT_ID = <PORT of sim client> - 8601`
 
 # Example files
-concrete_transactions : `tests/optimised`
+concrete_transactions : `examples/optimised`
 
-test_transactions : `tests/problem`
+test_transactions : `examples/problem`
 
-test_domain : `tests/multiple_tokens_domain`
+test_domain : `examples/multiple_tokens_domain`
