@@ -3,6 +3,8 @@ Run archive node, serving Ethereum HTTP JSON-RPC on port 8545
 
 Install common software dependencies: `python`, `npm`
 
+Python Modules: `pip3 install GitPython`
+
 # Simulation Clients
 The following scripts by default launch 44 simulation networks.
 
@@ -40,6 +42,6 @@ If you want to run simulation standalone, sample command:
 # Example files
 concrete_transactions : `examples/optimised`
 
-example_transactions : `examples/multiple_tokens`
+example_transactions : `examples/0xeth/multiple_tokens`
 
-example_domain : `examples/multiple_tokens_domain`
+example_domain : `examples/0xeth/multiple_tokens_domain`

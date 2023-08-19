@@ -7,7 +7,7 @@ from subprocess import Popen, PIPE
 
 def run_optimization(optimization_command):
     cwd_dir = os.getcwd()
-    sim_dir = os.path.join(cwd_dir, 'eth_clients', 'optimized_hardhat')
+    sim_dir = os.path.join(cwd_dir, 'eth_clients', 'hardhat')
     # restart simulation nodes
     os.chdir(sim_dir)
     print("killing sim nodes")
@@ -33,8 +33,8 @@ def run_optimization(optimization_command):
     os.system(optimization_command)
     
 
-TRANSACTION = 'examples/aave2'
-DOMAIN = 'examples/aave2_domain'
+TRANSACTION = 'examples/0xeth/aave2'
+DOMAIN = 'examples/0xeth/aave2_domain'
 DEXES = 'sushiswap aave uniswapv3'
 command = f'python optimize.py -t {TRANSACTION} -d {DOMAIN} --dexes {DEXES} --reorder \
                     --n_iter 5 --num_samples 10 --parents_portion 0.0 --p_swap_max 0.8 --p_swap_min 0.1 \
